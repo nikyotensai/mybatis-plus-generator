@@ -1,0 +1,16 @@
+package ${package.DAO};
+
+import ${superServiceImplClassPackage};
+import ${package.Entity}.${entity};
+import ${package.Mapper}.${table.mapperName};
+import org.springframework.stereotype.Component;
+
+/**
+ * <p>
+ * ${table.comment}  服务实现类
+ * </p>
+ */
+@Component
+public class ${table.serviceImplName} extends ${superServiceImplClass}<${table.mapperName}, ${entity}> {
+
+}

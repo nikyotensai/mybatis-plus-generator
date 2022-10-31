@@ -1,0 +1,48 @@
+package ${package.Entity};
+
+#if(${activeRecord})
+import com.baomidou.mybatisplus.activerecord.Model;
+#end
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+
+#if(${havBigDecimal})
+import java.math.BigDecimal;
+#end
+#if(${table.hasDate})
+import java.util.Date;
+#end
+
+/**
+ * <p>
+ * ${table.comment}
+ * </p>
+ */
+@Data
+@TableName("${table.name}")
+#if(${activeRecord})
+public class ${entity} extends Model<${entity}> {
+#else
+public class ${entity} {
+#end
+
+#foreach($field in ${table.fields})
+#if(${field.comment.equals("")})
+#else
+    /**
+     * ${field.comment}
+     */
+#end
+#if(${field.keyFlag})
+    @TableId(type = IdType.${idGenType})
+#end
+#if($field.convert && ${field.name.toLowerCase()} != ${field.propertyName.toLowerCase()})
+    @TableField(value = "${field.name}")
+#end
+    private ${field.propertyType} ${field.propertyName};
+
+#end
+}

@@ -1,0 +1,13 @@
+package ${package.Mapper};
+
+import ${superMapperClassPackage};
+import ${package.Entity}.${entity};
+
+/**
+ * <p>
+ * Mapper接口
+ * </p>
+ */
+public interface ${table.mapperName} extends ${superMapperClass}<${entity}> {
+
+}
