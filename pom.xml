@@ -9,9 +9,8 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.github.nikyotensai</groupId>
     <artifactId>mybatis-plus-generator</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
 
 
