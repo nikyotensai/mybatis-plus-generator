@@ -3,9 +3,14 @@ package com.github.nikyotensai.config;
 import com.github.nikyotensai.config.rules.IdStrategy;
 import com.github.nikyotensai.config.rules.NamingStrategy;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * 策略配置项
  */
+@Getter
+@Setter
 public class StrategyConfig {
 
     /**
@@ -55,9 +60,6 @@ public class StrategyConfig {
      */
     private String[] exclude = null;
 
-    public NamingStrategy getNaming() {
-        return naming;
-    }
 
     public NamingStrategy getFieldNaming() {
         if (fieldNaming == null) {
@@ -66,40 +68,5 @@ public class StrategyConfig {
         return fieldNaming;
     }
 
-    public String getTablePrefix() {
-        return tablePrefix;
-    }
-
-    public IdStrategy getIdGenType() {
-        return idGenType;
-    }
-
-    public String[] getInclude() {
-        return include;
-    }
-
-    public String[] getExclude() {
-        return exclude;
-    }
-
-    public String getSuperEntityClass() {
-        return superEntityClass;
-    }
-
-    public void setSuperEntityClass(String superEntityClass) {
-        this.superEntityClass = superEntityClass;
-    }
-
-    public String getSuperMapperClass() {
-        return superMapperClass;
-    }
-
-    public String getSuperServiceImplClass() {
-        return superServiceImplClass;
-    }
-
-    public String getSuperControllerClass() {
-        return superControllerClass;
-    }
 
 }

@@ -129,7 +129,6 @@ public enum NamingStrategy {
      */
     public static String capitalFirst(String name) {
         if (StringUtils.isNotBlank(name)) {
-            //return name.substring(0, 1).toUpperCase() + name.substring(1);
             char[] array = name.toCharArray();
             array[0] -= 32;
             return String.valueOf(array);
