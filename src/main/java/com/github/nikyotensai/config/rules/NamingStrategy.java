@@ -1,8 +1,7 @@
 package com.github.nikyotensai.config.rules;
 
-import org.apache.commons.lang.StringUtils;
-
 import com.github.nikyotensai.config.ConstVal;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * 从数据库表到文件的命名策略
@@ -15,23 +14,7 @@ public enum NamingStrategy {
     /**
      * 下划线转驼峰命名
      */
-    underline_to_camel,
-    /**
-     * 仅去掉前缀
-     */
-    remove_prefix,
-    /**
-     * 去掉前缀并且转驼峰
-     */
-    remove_prefix_and_camel,
-    /**
-     * 去掉第一个下划线之前内容，后面原样输出
-     */
-    remove_underline,
-    /**
-     * 去掉第一个下划线之前内容，后面转驼峰
-     */
-    remove_underline_and_camel;
+    underline_to_camel;
 
     public static String underlineToCamel(String name) {
         // 快速检查

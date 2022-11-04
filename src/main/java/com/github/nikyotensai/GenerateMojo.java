@@ -1,18 +1,11 @@
 package com.github.nikyotensai;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.stream.Collectors;
-
+import com.github.nikyotensai.config.ConstVal;
+import com.github.nikyotensai.config.TemplateConfig;
+import com.github.nikyotensai.config.builder.ConfigBuilder;
+import com.github.nikyotensai.config.po.TableField;
+import com.github.nikyotensai.config.po.TableInfo;
+import com.github.nikyotensai.config.util.ClassLoaderUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -23,11 +16,10 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
 
-import com.github.nikyotensai.config.ConstVal;
-import com.github.nikyotensai.config.TemplateConfig;
-import com.github.nikyotensai.config.builder.ConfigBuilder;
-import com.github.nikyotensai.config.po.TableField;
-import com.github.nikyotensai.config.po.TableInfo;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 生成文件
@@ -48,6 +40,7 @@ public class GenerateMojo extends AbstractGenerateMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
+            ClassLoaderUtil.init(project.getSystemClasspathElements());
             log.info("==========================准备生成文件...==========================");
             // 初始化配置
             initConfig();
@@ -106,6 +99,7 @@ public class GenerateMojo extends AbstractGenerateMojo {
             ctx.put("superServiceImplClass", superServiceImplClass);
             ctx.put("enableCache", generatorConfig.isEnableCache());
             ctx.put("activeRecord", generatorConfig.isActiveRecord());
+            ctx.put("author", generatorConfig.getStrategy().getAuthor());
             ctx.put("date", date);
             ctxData.put(tableInfo.getEntityName(), ctx);
         }

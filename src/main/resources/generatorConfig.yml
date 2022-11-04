@@ -5,9 +5,10 @@ dataSource:
   username: root
   password: 123456
 strategy:
+  author: nikyotensai
   naming: underline_to_camel
   tablePrefix: city
-  idGenType: auto #
+  idGenType: AUTO #
 packageInfo:
   parent: com.github.nikyotensai
   dao: dao

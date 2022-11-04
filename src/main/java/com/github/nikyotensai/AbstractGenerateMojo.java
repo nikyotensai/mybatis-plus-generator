@@ -1,10 +1,6 @@
 package com.github.nikyotensai;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-
+import com.github.nikyotensai.config.builder.ConfigBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.logging.Log;
@@ -13,7 +9,9 @@ import org.apache.maven.project.MavenProject;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
-import com.github.nikyotensai.config.builder.ConfigBuilder;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 /**
  * 插件基类，用于属性配置 设计成抽象类主要是用于后期可扩展，共享参数配置。
@@ -21,12 +19,10 @@ import com.github.nikyotensai.config.builder.ConfigBuilder;
 public abstract class AbstractGenerateMojo extends AbstractMojo {
 
     @Parameter(property = "project", readonly = true, required = true)
-    private MavenProject project;
+    protected MavenProject project;
 
     @Parameter
     private String configurationFile;
-    @Parameter
-    private boolean useShadow;
 
     protected ConfigBuilder config;
 
@@ -53,12 +49,6 @@ public abstract class AbstractGenerateMojo extends AbstractMojo {
 
     private InputStream getConfigFileStream() throws FileNotFoundException {
         if (StringUtils.isNotEmpty(configurationFile)) {
-            if (useShadow) {
-                File shadowFile = new File(configurationFile.replace(".", "_shadow."));
-                if (shadowFile.exists()) {
-                    return new FileInputStream(shadowFile);
-                }
-            }
             return new FileInputStream(configurationFile);
         }
         return this.getClass().getClassLoader().getResourceAsStream("generatorConfig.yml");

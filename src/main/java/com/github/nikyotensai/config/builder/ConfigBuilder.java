@@ -1,30 +1,18 @@
 package com.github.nikyotensai.config.builder;
 
+import com.github.nikyotensai.config.*;
+import com.github.nikyotensai.config.po.TableField;
+import com.github.nikyotensai.config.po.TableInfo;
+import com.github.nikyotensai.config.rules.NamingStrategy;
+import com.github.nikyotensai.config.rules.QuerySQL;
+import org.apache.commons.lang.StringUtils;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.apache.commons.lang.StringUtils;
-
-import com.github.nikyotensai.config.ConstVal;
-import com.github.nikyotensai.config.DataSourceConfig;
-import com.github.nikyotensai.config.PackageConfig;
-import com.github.nikyotensai.config.StrategyConfig;
-import com.github.nikyotensai.config.TemplateConfig;
-import com.github.nikyotensai.config.po.TableField;
-import com.github.nikyotensai.config.po.TableInfo;
-import com.github.nikyotensai.config.rules.DbType;
-import com.github.nikyotensai.config.rules.IdStrategy;
-import com.github.nikyotensai.config.rules.NamingStrategy;
-import com.github.nikyotensai.config.rules.QuerySQL;
+import java.util.*;
 
 /**
  * 配置汇总 传递给文件生成工具
@@ -84,8 +72,6 @@ public class ConfigBuilder {
         this.template = template;
     }
 
-    // ************************ 曝露方法 BEGIN*****************************
-
     /**
      * 所有包配置信息
      *
@@ -143,7 +129,6 @@ public class ConfigBuilder {
         return template == null ? new TemplateConfig() : template;
     }
 
-    // ****************************** 曝露方法 END**********************************
 
     /**
      * 处理包配置
@@ -151,14 +136,14 @@ public class ConfigBuilder {
      * @param config PackageConfig
      */
     private void handlerPackage(String outputDir, PackageConfig config) {
-        packageInfo = new HashMap<String, String>();
+        packageInfo = new HashMap<>();
         packageInfo.put(ConstVal.MODULENAME, config.getModuleName());
         packageInfo.put(ConstVal.ENTITY, joinPackage(config.getParent(), config.getEntity()));
         packageInfo.put(ConstVal.MAPPER, joinPackage(config.getParent(), config.getMapper()));
         packageInfo.put(ConstVal.XML, joinPackage("", outputDir.replace("java", "resources") + "/" + config.getXml()));
         packageInfo.put(ConstVal.SERVICEIMPL, joinPackage(config.getParent(), config.getDao()));
 
-        pathInfo = new HashMap<String, String>();
+        pathInfo = new HashMap<>();
         pathInfo.put(ConstVal.ENTITY_PATH, joinPath(outputDir, packageInfo.get(ConstVal.ENTITY)));
         pathInfo.put(ConstVal.MAPPER_PATH, joinPath(outputDir, packageInfo.get(ConstVal.MAPPER)));
         pathInfo.put(ConstVal.XML_PATH, packageInfo.get(ConstVal.XML));
@@ -172,7 +157,7 @@ public class ConfigBuilder {
      */
     private void handlerDataSource(DataSourceConfig config) {
         connection = config.getConn();
-        querySQL = getQuerySQL(config.getDbType());
+        querySQL = getQuerySQL();
     }
 
     /**
@@ -186,7 +171,7 @@ public class ConfigBuilder {
     }
 
     /**
-     * 处理superClassName,IdClassType,IdStrategy配置
+     * 处理superClassName,IdClassType,IdType配置
      *
      * @param config 策略配置
      */
@@ -202,34 +187,17 @@ public class ConfigBuilder {
             superMapperClass = config.getSuperMapperClass();
         }
         superEntityClass = config.getSuperEntityClass();
-
-        // ID 策略判断
-        if (config.getIdGenType() == IdStrategy.auto) {
-            idType = IdStrategy.auto.getValue();
-        } else if (config.getIdGenType() == IdStrategy.input) {
-            idType = IdStrategy.input.getValue();
-        } else if (config.getIdGenType() == IdStrategy.none) {
-            idType = IdStrategy.none.getValue();
-        } else if (config.getIdGenType() == IdStrategy.assign_id) {
-            idType = IdStrategy.assign_id.getValue();
-        } else if (config.getIdGenType() == IdStrategy.assign_uuid) {
-            idType = IdStrategy.assign_uuid.getValue();
-        } else {
-            idType = IdStrategy.id_worker.getValue();
-        }
+        idType = config.getIdGenType().name();
     }
 
     /**
      * 处理表对应的类名称
      *
-     * @param tableList   表名称
-     * @param strategy    命名策略
-     * @param tablePrefix
      * @return 补充完整信息后的表
      */
-    private List<TableInfo> processTable(List<TableInfo> tableList, NamingStrategy strategy, String tablePrefix) {
+    private List<TableInfo> processTable(List<TableInfo> tableList, NamingStrategy strategy) {
         for (TableInfo tableInfo : tableList) {
-            tableInfo.setEntityName(NamingStrategy.capitalFirst(processName(tableInfo.getName(), strategy, tablePrefix)));
+            tableInfo.setEntityName(NamingStrategy.capitalFirst(processName(tableInfo.getName(), strategy)));
             tableInfo.setMapperName(tableInfo.getEntityName() + ConstVal.MAPPER);
             tableInfo.setXmlName(tableInfo.getMapperName());
             tableInfo.setServiceImplName(tableInfo.getEntityName() + ConstVal.SERVICEIMPL);
@@ -278,7 +246,7 @@ public class ConfigBuilder {
                         }
                     }
                     if (StringUtils.isNotBlank(tableInfo.getName())) {
-                        List<TableField> fieldList = getListFields(tableInfo.getName(), fieldStrategy);
+                        List<TableField> fieldList = getListFields(tableInfo.getName(), fieldStrategy, config.getSuperEntityColumns());
                         tableInfo.setFields(fieldList);
                         tableList.add(tableInfo);
                     }
@@ -301,7 +269,7 @@ public class ConfigBuilder {
                 e.printStackTrace();
             }
         }
-        return processTable(tableList, strategy, config.getTablePrefix());
+        return processTable(tableList, strategy);
     }
 
     /**
@@ -311,14 +279,18 @@ public class ConfigBuilder {
      * @param strategy  命名策略
      * @return 表信息
      */
-    private List<TableField> getListFields(String tableName, NamingStrategy strategy) throws SQLException {
+    private List<TableField> getListFields(String tableName, NamingStrategy strategy, String[] superEntityColumns) throws SQLException {
         boolean havedId = false;
 
         PreparedStatement pstate = connection.prepareStatement(String.format(querySQL.getTableFieldsSql(), tableName));
         ResultSet results = pstate.executeQuery();
 
-        List<TableField> fieldList = new ArrayList<TableField>();
+        List<TableField> fieldList = new ArrayList<>();
         while (results.next()) {
+            String fieldName = results.getString(querySQL.getFieldName());
+            if (superEntityColumns != null && Arrays.asList(superEntityColumns).contains(fieldName)) {
+                continue;
+            }
             TableField field = new TableField();
             String key = results.getString(querySQL.getFieldKey());
             // 避免多重主键设置，目前只取第一个找到ID，并放到list中的索引为0的位置
@@ -381,49 +353,19 @@ public class ConfigBuilder {
     private String processFiledType(String type) {
         if (QuerySQL.MYSQL == querySQL) {
             return processMySqlType(type);
-        } else if (QuerySQL.ORACLE == querySQL) {
-            return processOracleType(type);
         }
         return null;
     }
 
     /**
      * 处理字段名称
-     *
-     * @return 根据策略返回处理后的名称
      */
     private String processName(String name, NamingStrategy strategy) {
-        return processName(name, strategy, null);
-    }
-
-    /**
-     * 处理字段名称
-     *
-     * @param name
-     * @param strategy
-     * @param tablePrefix
-     * @return 根据策略返回处理后的名称
-     */
-    private String processName(String name, NamingStrategy strategy, String tablePrefix) {
         String propertyName = "";
-        switch (strategy) {
-            case remove_prefix_and_camel:
-                propertyName = NamingStrategy.removePrefixAndCamel(name, tablePrefix);
-                break;
-            case underline_to_camel:
-                propertyName = NamingStrategy.underlineToCamel(name);
-                break;
-            case remove_prefix:
-                propertyName = NamingStrategy.removePrefix(name, tablePrefix);
-                break;
-            case remove_underline:
-                propertyName = NamingStrategy.removeUnderline(name);
-                break;
-            case remove_underline_and_camel:
-                propertyName = NamingStrategy.removeUnderlineAndCamel(name);
-                break;
-            default:
-                propertyName = name;
+        if (strategy == NamingStrategy.underline_to_camel) {
+            propertyName = NamingStrategy.underlineToCamel(name);
+        } else {
+            propertyName = name;
         }
         return propertyName;
     }
@@ -496,12 +438,7 @@ public class ConfigBuilder {
      *
      * @return DB类型
      */
-    private QuerySQL getQuerySQL(DbType dbType) {
-        for (QuerySQL qs : QuerySQL.values()) {
-            if (qs.getDbType().equals(dbType.getValue())) {
-                return qs;
-            }
-        }
+    private QuerySQL getQuerySQL() {
         return QuerySQL.MYSQL;
     }
 

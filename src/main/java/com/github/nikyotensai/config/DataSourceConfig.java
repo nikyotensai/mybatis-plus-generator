@@ -1,10 +1,9 @@
 package com.github.nikyotensai.config;
 
+import com.baomidou.mybatisplus.annotation.DbType;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
-
-import com.github.nikyotensai.config.rules.DbType;
 
 /**
  * 数据库配置
@@ -51,9 +50,7 @@ public class DataSourceConfig {
         try {
             Class.forName(driverName);
             conn = DriverManager.getConnection(url, username, password);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return conn;

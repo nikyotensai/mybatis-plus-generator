@@ -20,10 +20,15 @@ import java.util.Date;
  * <p>
  * ${table.comment}
  * </p>
+ *
+ * @author ${author}
+ * @since ${date}
  */
 @Data
 @TableName("${table.name}")
-#if(${activeRecord})
+#if(${superEntityClass})
+public class ${entity} extends ${superEntityClass}#if(${activeRecord})<${entity}>#end {
+#elseif(${activeRecord})
 public class ${entity} extends Model<${entity}> {
 #else
 public class ${entity} {
