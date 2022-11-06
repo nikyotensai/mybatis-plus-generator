@@ -4,7 +4,6 @@ import com.github.nikyotensai.config.DataSourceConfig;
 import com.github.nikyotensai.config.PackageConfig;
 import com.github.nikyotensai.config.StrategyConfig;
 import com.github.nikyotensai.config.TemplateConfig;
-
 import lombok.Getter;
 import lombok.Setter;
 

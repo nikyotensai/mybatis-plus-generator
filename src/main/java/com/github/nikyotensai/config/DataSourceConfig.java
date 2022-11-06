@@ -45,15 +45,9 @@ public class DataSourceConfig {
      *
      * @return Connection
      */
-    public Connection getConn() {
-        Connection conn = null;
-        try {
-            Class.forName(driverName);
-            conn = DriverManager.getConnection(url, username, password);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return conn;
+    public Connection getConn() throws Exception {
+        Class.forName(driverName);
+        return DriverManager.getConnection(url, username, password);
     }
 
 }

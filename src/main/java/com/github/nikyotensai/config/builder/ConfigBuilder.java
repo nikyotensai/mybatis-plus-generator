@@ -5,6 +5,7 @@ import com.github.nikyotensai.config.po.TableField;
 import com.github.nikyotensai.config.po.TableInfo;
 import com.github.nikyotensai.config.rules.NamingStrategy;
 import com.github.nikyotensai.config.rules.QuerySQL;
+import com.github.nikyotensai.config.util.LogUtil;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
@@ -65,7 +66,7 @@ public class ConfigBuilder {
      * @param strategyConfig   表配置
      */
     public ConfigBuilder(PackageConfig packageConfig, DataSourceConfig dataSourceConfig, StrategyConfig strategyConfig,
-                         TemplateConfig template, String outputDir) {
+                         TemplateConfig template, String outputDir) throws Exception {
         handlerPackage(outputDir, packageConfig);
         handlerDataSource(dataSourceConfig);
         handlerStrategy(strategyConfig);
@@ -155,7 +156,7 @@ public class ConfigBuilder {
      *
      * @param config DataSourceConfig
      */
-    private void handlerDataSource(DataSourceConfig config) {
+    private void handlerDataSource(DataSourceConfig config) throws Exception {
         connection = config.getConn();
         querySQL = getQuerySQL();
     }
@@ -251,7 +252,7 @@ public class ConfigBuilder {
                         tableList.add(tableInfo);
                     }
                 } else {
-                    System.err.println("当前数据库为空！！！");
+                    LogUtil.error("当前数据库为空！！！");
                 }
             }
         } catch (SQLException e) {

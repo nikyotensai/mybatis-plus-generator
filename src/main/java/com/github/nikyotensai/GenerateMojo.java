@@ -153,29 +153,24 @@ public class GenerateMojo extends AbstractGenerateMojo {
      *
      * @param context vm上下文
      */
-    private void batchOutput(String entityName, VelocityContext context) {
-        try {
-            String entityFile = String.format(outputFiles.get(ConstVal.ENTITY), entityName);
-            String mapperFile = String.format(outputFiles.get(ConstVal.MAPPER), entityName);
-            String xmlFile = String.format(outputFiles.get(ConstVal.XML), entityName);
-            String implFile = String.format(outputFiles.get(ConstVal.SERVICEIMPL), entityName);
+    private void batchOutput(String entityName, VelocityContext context) throws IOException {
+        String entityFile = String.format(outputFiles.get(ConstVal.ENTITY), entityName);
+        String mapperFile = String.format(outputFiles.get(ConstVal.MAPPER), entityName);
+        String xmlFile = String.format(outputFiles.get(ConstVal.XML), entityName);
+        String implFile = String.format(outputFiles.get(ConstVal.SERVICEIMPL), entityName);
 
-            TemplateConfig template = config.getTemplate();
+        TemplateConfig template = config.getTemplate();
 
-            // 根据override标识来判断是否需要创建文件（entity不判断）
-            vmToFile(context, template.getEntity(), entityFile);
-            if (isCreate(mapperFile)) {
-                vmToFile(context, template.getMapper(), mapperFile);
-            }
-            if (isCreate(xmlFile)) {
-                vmToFile(context, template.getXml(), xmlFile);
-            }
-            if (isCreate(implFile)) {
-                vmToFile(context, template.getServiceImpl(), implFile);
-            }
-        } catch (IOException e) {
-            log.error("无法创建文件，请检查配置信息！");
-            e.printStackTrace();
+        // 根据override标识来判断是否需要创建文件（entity不判断）
+        vmToFile(context, template.getEntity(), entityFile);
+        if (isCreate(mapperFile)) {
+            vmToFile(context, template.getMapper(), mapperFile);
+        }
+        if (isCreate(xmlFile)) {
+            vmToFile(context, template.getXml(), xmlFile);
+        }
+        if (isCreate(implFile)) {
+            vmToFile(context, template.getServiceImpl(), implFile);
         }
     }
 

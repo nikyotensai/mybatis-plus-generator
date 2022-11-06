@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.nikyotensai.config.rules.NamingStrategy;
 import com.github.nikyotensai.config.util.ClassLoaderUtil;
+import com.github.nikyotensai.config.util.LogUtil;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -96,7 +97,7 @@ public class StrategyConfig {
                 return StringUtils.camelToUnderline(field.getName());
             }).distinct().toArray(String[]::new);
         } catch (Exception ex) {
-            System.err.println("getSuperEntityColumns error:" + ex.getMessage());
+            LogUtil.error("getSuperEntityColumns error:" + ex.getMessage());
         }
         return this.superEntityColumns;
     }

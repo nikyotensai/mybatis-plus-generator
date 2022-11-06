@@ -31,7 +31,7 @@ public class ClassLoaderUtil {
 
     public static ClassLoader getClassLoader() {
         if (classLoader == null) {
-            System.err.println("classLoader not inited");
+            LogUtil.error("classLoader not inited");
         }
         return classLoader;
     }

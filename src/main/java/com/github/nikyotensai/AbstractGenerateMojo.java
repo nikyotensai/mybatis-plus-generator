@@ -37,7 +37,7 @@ public abstract class AbstractGenerateMojo extends AbstractMojo {
     /**
      * 初始化配置
      */
-    protected void initConfig() throws FileNotFoundException {
+    protected void initConfig() throws Exception {
         if (generatorConfig == null) {
             InputStream fis = getConfigFileStream();
             generatorConfig = yaml2Config(fis);
