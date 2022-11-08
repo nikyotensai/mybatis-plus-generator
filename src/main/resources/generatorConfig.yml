@@ -8,7 +8,7 @@ strategy:
   author: nikyotensai
   naming: underline_to_camel
   tablePrefix: city
-  idGenType: AUTO #
+  idGenType: AUTO
 packageInfo:
   parent: com.github.nikyotensai
   dao: dao
