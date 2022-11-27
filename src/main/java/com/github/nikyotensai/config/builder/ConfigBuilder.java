@@ -196,12 +196,18 @@ public class ConfigBuilder {
      *
      * @return 补充完整信息后的表
      */
-    private List<TableInfo> processTable(List<TableInfo> tableList, NamingStrategy strategy) {
+    private List<TableInfo> processTable(List<TableInfo> tableList, StrategyConfig config, NamingStrategy strategy) {
         for (TableInfo tableInfo : tableList) {
-            tableInfo.setEntityName(NamingStrategy.capitalFirst(processName(tableInfo.getName(), strategy)));
-            tableInfo.setMapperName(tableInfo.getEntityName() + ConstVal.MAPPER);
+            String ignorePrefix = config.getIgnorePrefix();
+            String entityName = tableInfo.getName();
+            if (ignorePrefix != null && !ignorePrefix.isEmpty()) {
+                entityName = entityName.replace(ignorePrefix, "");
+            }
+            entityName = NamingStrategy.capitalFirst(processName(entityName, strategy));
+            tableInfo.setEntityName(entityName);
+            tableInfo.setMapperName(entityName + ConstVal.MAPPER);
             tableInfo.setXmlName(tableInfo.getMapperName());
-            tableInfo.setServiceImplName(tableInfo.getEntityName() + ConstVal.SERVICEIMPL);
+            tableInfo.setServiceImplName(entityName + ConstVal.SERVICEIMPL);
         }
         return tableList;
     }
@@ -270,7 +276,7 @@ public class ConfigBuilder {
                 e.printStackTrace();
             }
         }
-        return processTable(tableList, strategy);
+        return processTable(tableList, config, strategy);
     }
 
     /**

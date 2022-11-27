@@ -7,7 +7,8 @@ dataSource:
 strategy:
   author: nikyotensai
   naming: underline_to_camel
-  tablePrefix: city
+  tablePrefix: t_city
+  ignorePrefix: t_
   idGenType: AUTO
 packageInfo:
   parent: com.github.nikyotensai

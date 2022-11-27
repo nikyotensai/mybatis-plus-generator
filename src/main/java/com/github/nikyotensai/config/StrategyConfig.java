@@ -34,6 +34,11 @@ public class StrategyConfig {
     private String tablePrefix;
 
     /**
+     * 表前缀
+     */
+    private String ignorePrefix;
+
+    /**
      * Entity 中的ID生成类型
      */
     private IdType idGenType;
